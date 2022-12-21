@@ -1,0 +1,4 @@
+**/__pycache__
+**/.vscode
+collector/repos
+**/functions.json

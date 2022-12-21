@@ -1,0 +1,12 @@
+---
+
+FUNC_STATS_FILE: collector/functions.json
+
+SERVER: github.com
+
+USER: e-lab
+
+REPOS:
+  TORCH_TOOLBOX:
+    NAME: torch-toolbox
+    DIRNAME: ""
