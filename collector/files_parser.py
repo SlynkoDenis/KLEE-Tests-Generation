@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
+import logging
 
 from collector.function import Function, Signature
 import clang.cindex
+
+logging.getLogger(__name__)
 
 
 class BaseFunctionsParser(ABC):
@@ -12,17 +15,14 @@ class BaseFunctionsParser(ABC):
         return self
 
     def __next__(self) -> Function:
-        node = next(self._cursor)
-        while not self._accepts_node(node):
+        while True:
             node = next(self._cursor)
-        return self._get_function_node(node)
+            func = self._get_function_node(node)
+            if func:
+                return func
 
     @abstractmethod
-    def _accepts_node(self, node: clang.cindex.Cursor) -> bool:
-        pass
-
-    @abstractmethod
-    def _get_function_node(self, node: clang.cindex.Cursor) -> Function:
+    def _get_function_node(self, node: clang.cindex.Cursor) -> Function | None:
         pass
 
 
@@ -42,30 +42,36 @@ class FunctionParser(BaseFunctionsParser):
             ) > 0
         )
 
-    def _get_function_node(self, node: clang.cindex.Cursor) -> Function:
-        assert node.get_definition()
-        print(node.displayname)
-        return Function(
+    def _get_function_node(self, node: clang.cindex.Cursor) -> Function | None:
+        if not self._accepts_node(node):
+            return None
+
+        func = Function(
             node.location.file.name,
             node.spelling,
-            self.get_signature(
-                node.spelling,
-                [x.spelling for x in node.get_definition().get_tokens()]
-            )
+            self.get_signature(node)
         )
+        if (
+            func.signature.static
+            or "" == (joined_args := " ".join(func.signature.args))
+            or "struct " in joined_args
+            or "*" in joined_args
+        ):
+            return None
+        logging.debug(node.displayname)
+        return func
 
     @staticmethod
-    def get_signature(func_name: str, def_tokens: list[str]) -> Signature:
-        signature_end = [idx for idx, x in enumerate(def_tokens) if x == "{"]
-        assert signature_end
-        assert def_tokens[signature_end[0] - 1] == ")"
+    def get_signature(node: clang.cindex.Cursor) -> Signature:
+        def_tokens = [x.spelling for x in node.get_definition().get_tokens()]
+        static = bool(def_tokens[0] == "static")
 
-        return_type = [idx for idx, x in enumerate(def_tokens) if x == func_name]
-        assert return_type
-        assert return_type[0] < signature_end[0]
-        assert def_tokens[return_type[0] + 1] == "("
-        start_pos = 0 if def_tokens[0] != "static" else 1
+        signature: str = node.displayname
+        open_br = signature.find("(") + 1
+        close_br = signature.find(")")
+        assert open_br <= close_br
         return Signature(
-            " ".join(def_tokens[start_pos:return_type[0]]),
-            " ".join(def_tokens[return_type[0]+1:signature_end[0]]).split(",")
+            static,
+            "",
+            signature[open_br:close_br].split(",")
         )

@@ -2,11 +2,13 @@
 
 FUNC_STATS_FILE: collector/functions.json
 
+VECTORS_DIR: vectors
+
 SERVER: github.com
 
-USER: e-lab
+USER: llvm
 
 REPOS:
-  TORCH_TOOLBOX:
-    NAME: torch-toolbox
+  LLVM_PROJECT:
+    NAME: llvm-project
     DIRNAME: ""

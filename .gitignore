@@ -2,3 +2,6 @@
 **/.vscode
 collector/repos
 **/functions.json
+**/*.bc
+**/klee-*
+vectors

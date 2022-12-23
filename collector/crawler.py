@@ -1,4 +1,5 @@
 import glob
+import logging
 from pathlib import Path
 
 from git import Repo
@@ -6,6 +7,8 @@ import clang.cindex
 
 from config import Config
 from collector.files_parser import BaseFunctionsParser, FunctionParser
+
+logging.getLogger(__name__)
 
 
 class ReposCrawler:
@@ -21,9 +24,11 @@ class ReposCrawler:
         for repo_info in self._conf.REPOS.values():
             self._repos[repo_info.NAME] = repos_path / repo_info.DIRNAME / repo_info.NAME
             if not self._repos[repo_info.NAME].exists():
+                logging.debug("Cloning repo %s...", repo_info.NAME)
                 Repo.clone_from(
                     self._conf.get_repo_url(repo_info.NAME),
-                    self._repos[repo_info.NAME]
+                    self._repos[repo_info.NAME],
+                    multi_options=["--single-branch", "--depth=1"]
                 )
 
     def iterate(self) -> BaseFunctionsParser:

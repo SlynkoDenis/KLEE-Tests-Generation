@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Signature:
+    static: bool
     return_type: str
     args: list[str]
 
@@ -11,9 +12,14 @@ class Signature:
 
     def to_dict(self) -> dict:
         return {
+            "static": self.static,
             "return_type": self.return_type,
             "args": self.args
         }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(**data)
 
 
 @dataclass
@@ -35,3 +41,8 @@ class Function:
             "func_name": self.func_name,
             "signature": self.signature.to_dict()
         }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        data["signature"] = Signature.from_dict(data["signature"])
+        return cls(**data)

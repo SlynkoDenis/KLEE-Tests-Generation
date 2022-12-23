@@ -12,10 +12,14 @@ class RepoInfo(BaseModel):
 
 
 class Config(BaseModel):
+    KLEE_PATH: ClassVar[str] = "/home/huawei/Desktop/github/klee/include"
+    KLEE_BIN_PATH: ClassVar[str] = "/home/huawei/Desktop/github/klee/build/bin"
     LIBCLANG_PATH: ClassVar[str] = "/usr/lib/llvm-14/lib/libclang-14.so.1"
     REPOS_PATH: ClassVar[str] = "collector/repos"
 
     FUNC_STATS_FILE: str
+
+    VECTORS_DIR: str
 
     SERVER: str
 
