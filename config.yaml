@@ -1,5 +1,9 @@
 ---
 
+# uncomment to run locally
+# KLEE_INCLUDE_PATH: <path-to-klee-source>/include
+# KLEE_BIN_PATH: <path-to-klee-build>/bin
+
 FUNC_STATS_FILE: collector/functions.json
 
 VECTORS_DIR: vectors

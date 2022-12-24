@@ -1,7 +1,10 @@
 from functools import lru_cache
+import logging.config
+import os
 from pathlib import Path
-from typing import ClassVar
+import typing
 
+# pylint: disable=no-name-in-module
 from pydantic import BaseModel
 from yaml import safe_load
 
@@ -12,10 +15,10 @@ class RepoInfo(BaseModel):
 
 
 class Config(BaseModel):
-    KLEE_PATH: ClassVar[str] = "/home/huawei/Desktop/github/klee/include"
-    KLEE_BIN_PATH: ClassVar[str] = "/home/huawei/Desktop/github/klee/build/bin"
-    LIBCLANG_PATH: ClassVar[str] = "/usr/lib/llvm-14/lib/libclang-14.so.1"
-    REPOS_PATH: ClassVar[str] = "collector/repos"
+    REPOS_PATH: typing.ClassVar[str] = "collector/repos"
+
+    KLEE_INCLUDE_PATH: typing.Optional[str]
+    KLEE_BIN_PATH: typing.Optional[str]
 
     FUNC_STATS_FILE: str
 
@@ -25,11 +28,11 @@ class Config(BaseModel):
 
     USER: str
 
-    REPOS: dict[str, RepoInfo]
+    REPOS: typing.Dict[str, RepoInfo]
 
     @classmethod
     def get_config(cls, filepath: str = "config.yaml"):
-        with Path(filepath).open() as stream:
+        with Path(filepath).open(mode="r", encoding="utf-8") as stream:
             config = safe_load(stream)
             return cls(**config)
 
@@ -37,6 +40,28 @@ class Config(BaseModel):
         return f"https://{self.SERVER}/{self.USER}/{repo_name}.git"
 
 
-@lru_cache
+@lru_cache(maxsize=None)
 def get_config(filepath: str = "config.yaml") -> Config:
     return Config.get_config(filepath=filepath)
+
+
+def get_logger_config() -> dict:
+    return {
+        "version": 1,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": "INFO"
+            }
+        },
+        "root": {
+            "level": "INFO",
+            "handlers": ["console"]
+        }
+    }
+
+
+def setup(conf: Config):
+    logging.config.dictConfig(get_logger_config())
+    if conf.KLEE_BIN_PATH:
+        os.environ["PATH"] = f"{os.environ['PATH']}:{conf.KLEE_BIN_PATH}"

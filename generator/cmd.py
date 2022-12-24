@@ -1,6 +1,10 @@
+import logging
 import subprocess
+import typing
 
 from config import Config
+
+logging.getLogger(__name__)
 
 
 class SubprocessError(Exception):
@@ -9,26 +13,26 @@ class SubprocessError(Exception):
 
 class CommandExecutor:
     def __init__(self, conf: Config):
-        self.output: str | None = None
-        self.error: str | None = None
+        self.output: typing.Optional[str] = None
+        self.error: typing.Optional[str] = None
         self._conf = conf
 
     def execute(self, *args, **kwargs):
-        process = self._exec_impl(*args, **kwargs)
-        self.output, self.error = process.communicate()
+        proc = self._exec_impl(*args, **kwargs)
+        self.output, self.error = proc.communicate()
         self.output.decode("utf-8")
         self.error.decode("utf-8")
 
-        if process.returncode:
-            raise SubprocessError(f"Code {process.returncode}: {self.error}")
+        if proc.returncode:
+            raise SubprocessError(f"Code {proc.returncode}:\n{self.error.decode('utf-8')}")
         return self
 
     def _exec_impl(self, *args, **kwargs) -> subprocess.Popen:
-        process = subprocess.Popen(
+        logging.debug(args)
+        return subprocess.Popen(
             list(args),
             stdout=kwargs.pop("stdout", subprocess.PIPE),
             stdin=kwargs.pop("stdin", subprocess.PIPE),
             stderr=kwargs.pop("stderr", subprocess.PIPE),
             **kwargs
         )
-        return process

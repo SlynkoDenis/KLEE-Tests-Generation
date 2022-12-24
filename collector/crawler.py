@@ -1,6 +1,7 @@
 import glob
 import logging
 from pathlib import Path
+import typing
 
 from git import Repo
 import clang.cindex
@@ -15,7 +16,7 @@ class ReposCrawler:
     def __init__(self, conf: Config):
         self._conf = conf
         self._index = clang.cindex.Index.create()
-        self._repos: dict[str, Path] = dict()
+        self._repos: typing.Dict[str, Path] = {}
 
     def clone_repos(self):
         repos_path = Path(self._conf.REPOS_PATH)
@@ -24,7 +25,7 @@ class ReposCrawler:
         for repo_info in self._conf.REPOS.values():
             self._repos[repo_info.NAME] = repos_path / repo_info.DIRNAME / repo_info.NAME
             if not self._repos[repo_info.NAME].exists():
-                logging.debug("Cloning repo %s...", repo_info.NAME)
+                logging.info("Cloning repo %s...", repo_info.NAME)
                 Repo.clone_from(
                     self._conf.get_repo_url(repo_info.NAME),
                     self._repos[repo_info.NAME],

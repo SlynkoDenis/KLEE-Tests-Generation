@@ -1,11 +1,11 @@
-from dataclasses import dataclass
+import typing
 
 
-@dataclass
 class Signature:
-    static: bool
-    return_type: str
-    args: list[str]
+    def __init__(self, static: bool, return_type: str, args: typing.List[str]):
+        self.static: bool = static
+        self.return_type: str = return_type
+        self.args: typing.List[str] = args
 
     def __hash__(self):
         return hash((self.return_type, ", ".join(self.args),))
@@ -22,11 +22,11 @@ class Signature:
         return cls(**data)
 
 
-@dataclass
 class Function:
-    file_path: str
-    func_name: str
-    signature: Signature
+    def __init__(self, file_path: str, func_name: str, signature: Signature):
+        self.file_path: str = file_path
+        self.func_name: str = func_name
+        self.signature: Signature = signature
 
     def __repr__(self) -> str:
         return (f"<Function(file_path='{self.file_path}', func_name='{self.func_name}', "

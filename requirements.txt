@@ -1,3 +1,7 @@
-GitPython~=3.*
-pydantic~=1.*
-pyyaml~=5.*
+GitPython==3.*
+libclang==14.*
+pathlib==1.*
+pydantic==1.*
+pyyaml==5.*
+tabulate==0.*
+tqdm==4.*

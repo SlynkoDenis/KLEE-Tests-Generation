@@ -1,0 +1,5 @@
+*.md
+collector/repos
+**/__pycache__
+**/.vscode
+**/*.json
