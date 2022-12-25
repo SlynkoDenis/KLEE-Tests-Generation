@@ -29,7 +29,7 @@ def get_functions(
 def write_vectors(func: Function, conf: Config, save_temps: bool):
     vectors = test_function(func, conf, save_temps=save_temps)
     if vectors:
-        path = Path(conf.VECTORS_DIR, func.func_name)
+        path = Path(conf.VECTORS_DIR, f"{func.func_name}.json")
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open(mode="w", encoding="utf-8") as stream:
             json.dump(vars(vectors), stream, indent=4)

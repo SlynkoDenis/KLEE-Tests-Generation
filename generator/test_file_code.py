@@ -46,5 +46,7 @@ def test_file_code(func: Function, main_filename: str) -> typing.Tuple[CodeInfo,
 """
         header = CodeInfo(header_name, header_code, [])
         main.code = f'#include "{header_name}"\n{main.code}'
+    else:
+        main.code = f'#include "{func.file_path}"\n{main.code}'
 
     return main, header

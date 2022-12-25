@@ -140,7 +140,7 @@ def __test_function_impl(
             CoverageStatistics(conf).execute(str(output_dir)).output.decode("utf-8")
         )
     except SubprocessError as exc:
-        logging.debug("Compilation failed: %s", str(exc))
+        logging.debug("Failed: %s", str(exc))
         return None
 
 

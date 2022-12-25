@@ -28,7 +28,7 @@ class TestVectorsGetter:
         vectors = []
         files = glob(f"{self._output_dir}/*.ktest")
         for filename in files:
-            self._getter.execute(filepath=str(Path(self._output_dir, filename)))
+            self._getter.execute(filepath=filename)
             vectors.append(self._parse_output(self._getter.output))
         return vectors
 
@@ -36,7 +36,7 @@ class TestVectorsGetter:
     def _parse_output(output: bytes) -> typing.List[str]:
         output = output.decode("utf-8")
         data = []
-        object_idx = 0
+        object_idx = 1
         while True:
             hex_data = re.findall(fr"object {object_idx}: hex : (0x[0-9a-f]+)", output)
             assert len(hex_data) <= 1
